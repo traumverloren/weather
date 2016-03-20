@@ -40,22 +40,28 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
     <script>
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(success, error);
 
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(function(position) {
-            var key = "6d0af58f1221cec34ad4126a975288ab";
-            var lat = position.coords.latitude;
-            var lon = position.coords.longitude;
-            var data;
+        function success(position) {
+          var key = "6d0af58f1221cec34ad4126a975288ab";
+          var lat = position.coords.latitude;
+          var lon = position.coords.longitude;
+          var data;
 
-            $.getJSON( "https://api.forecast.io/forecast/" + key + "/" + lat + "," + lon + "?callback=?", function( data ) {
-              console.log(data);
-             $("#data").html("<h1>" + data.currently.summary + "</h1>" + "Current temperature is: " + Math.floor(data.currently.temperature) + " F"+ "<br>Feels like " + Math.floor(data.currently.apparentTemperature) + " F");
-            });
+          $.getJSON( "https://api.forecast.io/forecast/" + key + "/" + lat + "," + lon + "?callback=?", function(data) {
+            console.log(data);
+           $("#data").html("<h1>" + data.currently.summary + "</h1>" + "Current temperature is: " + Math.floor(data.currently.temperature) + " F"+ "<br>Feels like " + Math.floor(data.currently.apparentTemperature) + " F");
           });
-        } else {
-          ""
-        }
+        };
+
+        function error() {
+          $("#data").html("Sorry, unable to retrieve your location.");
+        };
+
+      } else {
+        $("#data").html("Sorry, geolocation is not supported by your browser.");
+      }
     </script>
   </body>
 </html>
