@@ -12,14 +12,28 @@
   <style>
     #data {
       font-family: Quicksand;
-      font-size: 24px;
+      font-size: 22px;
+    }
+
+    #data h1 {
+      font-family: Sacramento;
+      font-size: 42px;
+    }
+
+    .center-block {
+      margin-top: 60px;
+      float: none !important;
     }
   </style>
   <body>
     <div class="background container-fluid">
-
-      <div id="data">
-        <h1>You are here...</h1>
+      <div class="row">
+        <div class="col-sm-6 center-block text-center">
+          <div id="data">
+            <h1>Retrieving your weather info...</h1>
+            <i class="fa fa-3x fa-spinner fa-spin fa-pulse"></i>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -29,16 +43,19 @@
 
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(function(position) {
+            var key = "6d0af58f1221cec34ad4126a975288ab";
             var lat = position.coords.latitude;
             var lon = position.coords.longitude;
+            var data;
 
-            $.getJSON( "http://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lon + "&APPID=4d479df1c1e4f1ad4f3ccc5d0aebffb8", function( data ) {
+            $.getJSON( "https://api.forecast.io/forecast/" + key + "/" + lat + "," + lon + "?callback=?", function( data ) {
               console.log(data);
-             $("#data").html(JSON.stringify(data));
+             $("#data").html("<h1>" + data.currently.summary + "</h1>" + "Current temperature is: " + Math.floor(data.currently.temperature) + " F"+ "<br>Feels like " + Math.floor(data.currently.apparentTemperature) + " F");
             });
-        });
-
-      }
+          });
+        } else {
+          ""
+        }
     </script>
   </body>
 </html>
