@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Local Weather</title>
+  </head>
+  <body>
+
+    <div id = "data">
+      <h4>You are here:</h4>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <script>
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+       $("#data").html("latitude: " + position.coords.latitude + "<br>longitude: " + position.coords.longtitude);
+        });
+      }
+    </script>
+  </body>
+</html>
