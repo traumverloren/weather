@@ -10,12 +10,12 @@
   </head>
 
   <style>
-    #data {
+    .data {
       font-family: Quicksand;
       font-size: 22px;
     }
 
-    #data h1 {
+    .data h1 {
       font-family: Sacramento;
       font-size: 42px;
     }
@@ -29,9 +29,23 @@
     <div class="background container-fluid">
       <div class="row">
         <div class="col-sm-6 center-block text-center">
-          <div id="data">
-            <h1>Retrieving your weather info...</h1>
-            <i class="fa fa-3x fa-spinner fa-spin fa-pulse"></i>
+          <div class="data">
+            <div id="waiting">
+              <h1>Retrieving your weather info...</h1>
+              <i class="fa fa-3x fa-spinner fa-spin fa-pulse"></i>
+            </div>
+            <div id="weather-data">
+              <h1 id="summary"></h1>
+              <p>Current temperature: <span id="currentTemp"></span></p>
+
+              <p>Feels like: <span id="feelsTemp"></span></p>
+
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 center-block text-center">
+                <button class="btn btn-large btn-info fahrenheit">°F</button>
+          <button class="btn btn-large btn-info celsius">°C</button>
           </div>
         </div>
       </div>
@@ -40,28 +54,74 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
     <script>
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(success, error);
+      $(document).ready(function() {
+        $("#weather-data").hide(0);
+        $(".fahrenheit").hide(0);
+        $(".celsius").hide(0);
 
-        function success(position) {
-          var key = "6d0af58f1221cec34ad4126a975288ab";
-          var lat = position.coords.latitude;
-          var lon = position.coords.longitude;
-          var data;
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(success, error);
 
-          $.getJSON( "https://api.forecast.io/forecast/" + key + "/" + lat + "," + lon + "?callback=?", function(data) {
-            console.log(data);
-           $("#data").html("<h1>" + data.currently.summary + "</h1>" + "Current temperature is: " + Math.floor(data.currently.temperature) + " F"+ "<br>Feels like " + Math.floor(data.currently.apparentTemperature) + " F");
-          });
-        };
+          function success(position) {
+            var key = "6d0af58f1221cec34ad4126a975288ab";
+            var lat = position.coords.latitude;
+            var lon = position.coords.longitude;
+            var data;
 
-        function error() {
-          $("#data").html("Sorry, unable to retrieve your location.");
-        };
+            // Change to conversion functions, not 2 separate API calls
+            $.getJSON( "https://api.forecast.io/forecast/" + key + "/" + lat + "," + lon + "?units=us" + "&callback=?", function(data) {
+              $("#waiting").hide(0);
+              $("#weather-data").show(0);
+              $(".celsius").show(0);
 
-      } else {
-        $("#data").html("Sorry, geolocation is not supported by your browser.");
-      }
+
+              var summary = data.currently.summary;
+              var currentTemp = Math.floor(data.currently.temperature)
+              var feelsTemp = Math.floor(data.currently.apparentTemperature)
+
+              $("#summary").html(summary);
+              $("#currentTemp").html(currentTemp);
+              $("#feelsTemp").html(feelsTemp);
+
+              var convertToCelsius = function (temp) {
+                return (temp - 32) * (5/9)
+              }
+
+              var convertToFahrenheit = function (temp) {
+                return (temp * (9/5)) + 32
+              }
+
+              console.log(convertToCelsius(currentTemp));
+              console.log(convertToCelsius(feelsTemp));
+
+
+            });
+
+            $("button").click(function() {
+              $.getJSON( "https://api.forecast.io/forecast/" + key + "/" + lat + "," + lon + "?units=si" + "&callback=?", function(data) {
+                $(".fahrenheit").show(0);
+                $(".celsius").hide(0);
+
+
+                var summary = data.currently.summary;
+                var currentTemp = Math.floor(data.currently.temperature)
+                var feelsTemp = Math.floor(data.currently.apparentTemperature)
+
+                $("#summary").html(summary);
+                $("#currentTemp").html(currentTemp + "°C");
+                $("#feelsTemp").html(feelsTemp + "°C");
+              });
+            });
+          };
+
+          function error() {
+            $("#data").html("Sorry, unable to retrieve your location.");
+          };
+
+        } else {
+          $("#data").html("Sorry, geolocation is not supported by your browser.");
+        }
+      })
     </script>
   </body>
 </html>
