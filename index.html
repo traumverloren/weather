@@ -36,16 +36,16 @@
             </div>
             <div id="weather-data">
               <h1 id="summary"></h1>
-              <p>Current temperature: <span id="currentTemp"></span></p>
-
-              <p>Feels like: <span id="feelsTemp"></span></p>
-
+              <p>Current temperature: <span id="currentTemp"></span> °<span class="units">F</span></p>
+              <p>Feels like: <span id="feelsTemp"></span> °<span class="units">F</span></p>
             </div>
           </div>
         </div>
         <div class="col-sm-6 center-block text-center">
-                <button class="btn btn-large btn-info fahrenheit">°F</button>
-          <button class="btn btn-large btn-info celsius">°C</button>
+          <button class="btn btn-large btn-info convertUnits">°C</button>
+
+          <!-- <button class="btn btn-large btn-info toFahrenheit">°F</button>
+          <button class="btn btn-large btn-info toCelsius">°C</button> -->
           </div>
         </div>
       </div>
@@ -56,8 +56,7 @@
     <script>
       $(document).ready(function() {
         $("#weather-data").hide(0);
-        $(".fahrenheit").hide(0);
-        $(".celsius").hide(0);
+        $(".convertUnits").hide(0);
 
         if (navigator.geolocation) {
           navigator.geolocation.getCurrentPosition(success, error);
@@ -68,48 +67,38 @@
             var lon = position.coords.longitude;
             var data;
 
-            // Change to conversion functions, not 2 separate API calls
             $.getJSON( "https://api.forecast.io/forecast/" + key + "/" + lat + "," + lon + "?units=us" + "&callback=?", function(data) {
               $("#waiting").hide(0);
               $("#weather-data").show(0);
-              $(".celsius").show(0);
-
-
-              var summary = data.currently.summary;
-              var currentTemp = Math.floor(data.currently.temperature)
-              var feelsTemp = Math.floor(data.currently.apparentTemperature)
-
-              $("#summary").html(summary);
-              $("#currentTemp").html(currentTemp);
-              $("#feelsTemp").html(feelsTemp);
 
               var convertToCelsius = function (temp) {
                 return (temp - 32) * (5/9)
               }
 
-              var convertToFahrenheit = function (temp) {
-                return (temp * (9/5)) + 32
-              }
+              var summary = data.currently.summary;
+              var currentFahrenheitTemp = Math.round(data.currently.temperature);
+              var feelsFahrenheitTemp = Math.round(data.currently.apparentTemperature);
 
-              console.log(convertToCelsius(currentTemp));
-              console.log(convertToCelsius(feelsTemp));
+              var currentCelsiusTemp = Math.round(convertToCelsius(currentFahrenheitTemp));
+              var feelsCelsiusTemp = Math.round(convertToCelsius(feelsFahrenheitTemp));
 
+              $("#summary").html(summary);
+              $("#currentTemp").html(currentFahrenheitTemp);
+              $("#feelsTemp").html(feelsFahrenheitTemp);
+              $(".convertUnits").show(0);
 
-            });
-
-            $("button").click(function() {
-              $.getJSON( "https://api.forecast.io/forecast/" + key + "/" + lat + "," + lon + "?units=si" + "&callback=?", function(data) {
-                $(".fahrenheit").show(0);
-                $(".celsius").hide(0);
-
-
-                var summary = data.currently.summary;
-                var currentTemp = Math.floor(data.currently.temperature)
-                var feelsTemp = Math.floor(data.currently.apparentTemperature)
-
-                $("#summary").html(summary);
-                $("#currentTemp").html(currentTemp + "°C");
-                $("#feelsTemp").html(feelsTemp + "°C");
+              $("button").click(function() {
+                if ($(".units").html() === "C") {
+                  $("#currentTemp").html(currentFahrenheitTemp);
+                  $("#feelsTemp").html(feelsFahrenheitTemp);
+                  $(".units").html("F");
+                  $(".convertUnits").html("°C");
+                } else if ($(".units").html() === "F") {
+                  $("#currentTemp").html(currentCelsiusTemp);
+                  $("#feelsTemp").html(feelsCelsiusTemp);
+                  $(".units").html("C");
+                  $(".convertUnits").html("°F");
+                }
               });
             });
           };
