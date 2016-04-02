@@ -10,40 +10,79 @@
   </head>
 
   <style>
-    .data {
-      font-family: Quicksand;
-      font-size: 22px;
+    html, body {
+         margin: 0;
+         padding: 0;
+         height: 100%;
+     }
+
+    .steph {
+        align-self: flex-start;
+        margin-left: auto;
+    }
+    .jumbotron {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        font-family: Quicksand;
+        font-size: 22px;
+        padding: 0px;
     }
 
-    .data h1 {
-      font-family: Sacramento;
-      font-size: 48px;
+    .jumbotron h1 {
+        font-family: Sacramento;
+        font-size: 48px;
     }
 
-    .center-block {
-      margin-top: 60px;
-      float: none !important;
+    .jumbotron img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    @media (max-width: 768px) {
+      .jumbotron p {
+          font-size: 14px;
+      }
+
+      .jumbotron h1 {
+          font-size: 28px;
+          font-weight: bold;
+        }
+    }
+
+    .steph {
+        font-family: 'Quicksand';
+        font-size: 16px;
+    }
+
+    .steph a {
+        color: #009688;
+    }
+
+    .steph a:hover {
+        text-decoration: none;
+        color: #00796B;
     }
   </style>
   <body>
     <div class="background container-fluid">
+      <p class="pull-right steph">by <a href="https://traumverloren.github.io">stephanie</a></p>
       <div class="row">
-        <div class="col-sm-6 center-block text-center">
+        <div class="jumbotron text-center">
           <div class="data">
             <div class="waiting">
-              <img src="./images/waiting_2.png"></img>
+              <img src="./images/rainbow.png"></img>
               <h1>Retrieving your weather info...</h1>
-              <i class="fa fa-3x fa-spinner fa-spin fa-pulse"></i>
+              <i class="fa fa-2x fa-spinner fa-spin fa-pulse"></i>
             </div>
             <div class="weather-data">
               <div id="weather-icon"></div>
               <h1 id="summary"></h1>
-              <p>Current temperature: <span id="currentTemp"></span> °<span class="units">F</span></p>
-              <p>Feels like: <span id="feelsTemp"></span> °<span class="units">F</span></p>
+              <p><span id="currentTemp"></span> °<span class="units">F</span></p>
             </div>
           </div>
-        </div>
-        <div class="col-sm-6 center-block text-center">
           <button class="btn btn-large btn-info convertUnits">°C</button>
         </div>
       </div>
@@ -76,34 +115,26 @@
               var icon = data.currently.icon;
               var summary = data.currently.summary;
               var currentFahrenheitTemp = Math.round(data.currently.temperature);
-              var feelsFahrenheitTemp = Math.round(data.currently.apparentTemperature);
-
               var currentCelsiusTemp = Math.round(convertToCelsius(currentFahrenheitTemp));
-              var feelsCelsiusTemp = Math.round(convertToCelsius(feelsFahrenheitTemp));
 
               $("#summary").html(summary);
               $("#currentTemp").html(currentFahrenheitTemp);
-              $("#feelsTemp").html(feelsFahrenheitTemp);
               $(".convertUnits").show(0);
               $("#weather-icon").html('<img src="' + './images/' + assignImage(icon) + '" />');
 
               $("button").click(function() {
                 if ($(".units").html() === "C") {
                   $("#currentTemp").html(currentFahrenheitTemp);
-                  $("#feelsTemp").html(feelsFahrenheitTemp);
                   $(".units").html("F");
                   $(".convertUnits").html("°C");
                 } else if ($(".units").html() === "F") {
                   $("#currentTemp").html(currentCelsiusTemp);
-                  $("#feelsTemp").html(feelsCelsiusTemp);
                   $(".units").html("C");
                   $(".convertUnits").html("°F");
                 }
               });
 
               // Put in icons to show up based on icon field response.
-              // clear-day, clear-night, rain, snow, sleet, wind, fog, cloudy, partly-cloudy-day, or partly-cloudy-night
-              // also hail, thunderstorm, tornado possible in future, should also define a default
               function assignImage(icon) {
                 switch (icon) {
                   case "clear-day":
