@@ -17,7 +17,7 @@
 
     .data h1 {
       font-family: Sacramento;
-      font-size: 42px;
+      font-size: 48px;
     }
 
     .center-block {
@@ -30,11 +30,13 @@
       <div class="row">
         <div class="col-sm-6 center-block text-center">
           <div class="data">
-            <div id="waiting">
+            <div class="waiting">
+              <img src="./images/waiting_2.png"></img>
               <h1>Retrieving your weather info...</h1>
               <i class="fa fa-3x fa-spinner fa-spin fa-pulse"></i>
             </div>
-            <div id="weather-data">
+            <div class="weather-data">
+              <div id="weather-icon"></div>
               <h1 id="summary"></h1>
               <p>Current temperature: <span id="currentTemp"></span> °<span class="units">F</span></p>
               <p>Feels like: <span id="feelsTemp"></span> °<span class="units">F</span></p>
@@ -43,10 +45,6 @@
         </div>
         <div class="col-sm-6 center-block text-center">
           <button class="btn btn-large btn-info convertUnits">°C</button>
-
-          <!-- <button class="btn btn-large btn-info toFahrenheit">°F</button>
-          <button class="btn btn-large btn-info toCelsius">°C</button> -->
-          </div>
         </div>
       </div>
     </div>
@@ -55,7 +53,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
     <script>
       $(document).ready(function() {
-        $("#weather-data").hide(0);
+        $(".weather-data").hide(0);
         $(".convertUnits").hide(0);
 
         if (navigator.geolocation) {
@@ -68,13 +66,14 @@
             var data;
 
             $.getJSON( "https://api.forecast.io/forecast/" + key + "/" + lat + "," + lon + "?units=us" + "&callback=?", function(data) {
-              $("#waiting").hide(0);
-              $("#weather-data").show(0);
+              $(".waiting").hide();
+              $(".weather-data").show();
 
               var convertToCelsius = function (temp) {
                 return (temp - 32) * (5/9)
               }
 
+              var icon = data.currently.icon;
               var summary = data.currently.summary;
               var currentFahrenheitTemp = Math.round(data.currently.temperature);
               var feelsFahrenheitTemp = Math.round(data.currently.apparentTemperature);
@@ -86,6 +85,7 @@
               $("#currentTemp").html(currentFahrenheitTemp);
               $("#feelsTemp").html(feelsFahrenheitTemp);
               $(".convertUnits").show(0);
+              $("#weather-icon").html('<img src="' + './images/' + assignImage(icon) + '" />');
 
               $("button").click(function() {
                 if ($(".units").html() === "C") {
@@ -100,15 +100,64 @@
                   $(".convertUnits").html("°F");
                 }
               });
+
+              // Put in icons to show up based on icon field response.
+              // clear-day, clear-night, rain, snow, sleet, wind, fog, cloudy, partly-cloudy-day, or partly-cloudy-night
+              // also hail, thunderstorm, tornado possible in future, should also define a default
+              function assignImage(icon) {
+                switch (icon) {
+                  case "clear-day":
+                    return "sun.png";
+                    break;
+                  case "clear-night":
+                    return "moon.png";
+                    break;
+                  case "rain":
+                    return "rain.png";
+                    break;
+                  case "snow":
+                    return "snowing.png";
+                    break;
+                  case "sleet":
+                    return "snowing.png";
+                    break;
+                  case "wind":
+                    return "wind.png";
+                    break;
+                  case "fog":
+                    return "cloudy.png";
+                    break;
+                  case "cloudy":
+                    return "cloudy.png";
+                    break;
+                  case "partly-cloudy-day":
+                    return "partly_cloudy.png";
+                    break;
+                  case "partly-cloudy-night":
+                    return "nightclouds.png";
+                    break;
+                  case "hail":
+                    return "super_storm.png";
+                    break;
+                  case "tornado":
+                    return "tornado.png";
+                    break;
+                  case "thunderstorm":
+                    return "thunderstorm.png";
+                    break;
+                  default:
+                    return "rainbow.png";
+                }
+              }
             });
           };
 
           function error() {
-            $("#data").html("Sorry, unable to retrieve your location.");
+            $(".data").html('<img src="./images/doh.png" /><br/><p>Sorry, unable to retrieve your location.</p>');
           };
 
         } else {
-          $("#data").html("Sorry, geolocation is not supported by your browser.");
+          $(".data").html("Sorry, geolocation is not supported by your browser.");
         }
       })
     </script>
